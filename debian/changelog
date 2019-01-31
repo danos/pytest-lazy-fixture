@@ -1,0 +1,5 @@
+python-pytest-lazy-fixture (0.5.1-1) unstable; urgency=medium
+
+  * Initial release (Closes: #920923)
+
+ -- Joel Cross <joel@kazbak.co.uk>  Thu, 31 Jan 2019 15:38:05 +0000
