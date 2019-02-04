@@ -18,6 +18,8 @@ Package: python3-pytest-lazy-fixture
 Architecture: all
 Depends: ${python3:Depends}, ${misc:Depends}
 Description: Use your fixtures in @pytest.mark.parametrize (Python 3)
- An extension to Pytest that allows lazy-loading fixtures
+ An extension to Pytest that allows lazy-loading fixtures. This, combined with
+ the pytest.mark.parametrize function, allows the same fixture to be used
+ multiple times per test.
  .
  This package installs the library for Python 3.
