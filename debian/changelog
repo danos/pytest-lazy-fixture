@@ -1,3 +1,12 @@
+python-pytest-lazy-fixture (0.5.1-1.1) UNRELEASED; urgency=medium
+
+  * Update d/control file. Change the redundant lines on
+    Build-Depends filed: debhelper (>12), debhelper-compat(=12),
+    for debhelper-compat (=12). This was a recomendation of Scott
+    Kitterman.
+
+ -- Emmanuel Arias <emamnuelarias30@gmail.com>  Wed, 06 Feb 2019 02:34:17 +0000
+
 python-pytest-lazy-fixture (0.5.1-1) unstable; urgency=medium
 
   * Initial release (Closes: #920923)
