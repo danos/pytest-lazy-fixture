@@ -10,6 +10,10 @@ python-pytest-lazy-fixture (0.5.1-1.1) UNRELEASED; urgency=medium
   * Bump Standards-Version to 4.4.0.
   * Bump Standards-Version to 4.4.1.
 
+  [ Debian Janitor ]
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
+
  -- Emmanuel Arias <emamnuelarias30@gmail.com>  Wed, 06 Feb 2019 02:34:17 +0000
 
 python-pytest-lazy-fixture (0.5.1-1) unstable; urgency=medium
