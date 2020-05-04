@@ -13,6 +13,7 @@ python-pytest-lazy-fixture (0.5.1-1.1) UNRELEASED; urgency=medium
   [ Debian Janitor ]
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
     Repository-Browse.
+  * Update standards version to 4.5.0, no changes needed.
 
  -- Emmanuel Arias <emamnuelarias30@gmail.com>  Wed, 06 Feb 2019 02:34:17 +0000
 
