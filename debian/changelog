@@ -11,6 +11,8 @@ python-pytest-lazy-fixture (0.5.1-1.1) UNRELEASED; urgency=medium
   * Bump Standards-Version to 4.4.1.
   * d/control: Update Maintainer field with new Debian Python Team
     contact address.
+  * d/control: Update Vcs-* fields with new Debian Python Team Salsa
+    layout.
 
   [ Debian Janitor ]
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
