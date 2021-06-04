@@ -1,14 +1,18 @@
-python-pytest-lazy-fixture (0.5.1-1.1) UNRELEASED; urgency=medium
+python-pytest-lazy-fixture (0.6.3-1) UNRELEASED; urgency=medium
+
+  * Team Upload.
 
   [ Emmanuel Arias ]
+  * Update standards version to 4.5.1.
+  * d/watch: remove template lines from watch.
+  * d/tests: configure import-name to the correct module name.
+  * New upstream version 0.6.3.
   * Update d/control file. Change the redundant lines on
     Build-Depends filed: debhelper (>12), debhelper-compat(=12),
     for debhelper-compat (=12). This was a recomendation of Scott
     Kitterman.
 
   [ Ondřej Nový ]
-  * Bump Standards-Version to 4.4.0.
-  * Bump Standards-Version to 4.4.1.
   * d/control: Update Maintainer field with new Debian Python Team
     contact address.
   * d/control: Update Vcs-* fields with new Debian Python Team Salsa
@@ -17,9 +21,8 @@ python-pytest-lazy-fixture (0.5.1-1.1) UNRELEASED; urgency=medium
   [ Debian Janitor ]
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
     Repository-Browse.
-  * Update standards version to 4.5.0, no changes needed.
 
- -- Emmanuel Arias <emamnuelarias30@gmail.com>  Wed, 06 Feb 2019 02:34:17 +0000
+ -- Emmanuel Arias <eamanu@yaerobi.com>  Fri, 04 Jun 2021 10:48:58 -0300
 
 python-pytest-lazy-fixture (0.5.1-1) unstable; urgency=medium
 
