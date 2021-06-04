@@ -2,6 +2,11 @@
 import pytest
 from pytest_lazyfixture import sorted_by_dependency, lazy_fixture, _sorted_argnames
 
+try:
+    import numpy
+except ImportError:
+    numpy = None
+
 
 def test_fixture_in_parametrize_with_params(testdir):
     items = testdir.getitems("""
@@ -575,8 +580,8 @@ def test_sorted_by_dependency(params, expected_paths):
 
 
 @pytest.mark.parametrize('params,fixturenames,expect_keys', [
-    ({'b': 1, 'a': 0}, ['c', 'a', 'd', 'b'], ['a', 'b']),
-    ({'b': 1, 'a': 0}, ['c', 'b'], ['b', 'a'])
+    ({'b': 1, 'a': 0}, ['c', 'a', 'd', 'b'], ['c', 'a', 'd', 'b']),
+    ({'b': 1, 'a': 0}, ['c', 'b'], ['c', 'b', 'a'])
 ])
 def test_sorted_argnames(params, fixturenames, expect_keys):
     assert list(_sorted_argnames(params, fixturenames)) == expect_keys
@@ -698,3 +703,204 @@ def test_lazy_fixture_nested_fixtures(testdir):
     """)
     reprec = testdir.inline_run('-s')
     reprec.assertoutcome(passed=2)
+
+
+# https://github.com/TvoroG/pytest-lazy-fixture/issues/39
+def test_usefixture_runs_before_function_fixtures(testdir):
+    testdir.makepyfile("""
+        import pytest
+        from pytest_lazyfixture import lazy_fixture
+
+        invocation_order = []
+
+        @pytest.fixture
+        def module_fixture():
+            invocation_order.append('using module fixture')
+
+        @pytest.fixture
+        def fixture1():
+            invocation_order.append('using fixture1')
+            return 'fixture1'
+
+        @pytest.fixture
+        def fixture2():
+            invocation_order.append('using fixture2')
+            return 'fixture2'
+
+        @pytest.mark.usefixtures("module_fixture")
+        @pytest.mark.parametrize("fixt", [lazy_fixture("fixture1"), lazy_fixture("fixture2")])
+        def test_test(fixt):
+            if fixt == 'fixture2':
+                print(' '.join(invocation_order))
+    """)
+    result = testdir.runpytest('-s')
+    stdout = result.stdout.str()
+    assert (
+        'using module fixture using fixture1 using module fixture using fixture2' in stdout
+    )
+
+
+# https://github.com/TvoroG/pytest-lazy-fixture/issues/39
+def test_autouse_and_usefixture_module_scope_runs_before_function_fixtures(testdir):
+    testdir.makepyfile("""
+        import pytest
+        from pytest_lazyfixture import lazy_fixture
+
+        invocation_order = []
+
+        @pytest.fixture(autouse=True)
+        def autouse_fixture():
+            invocation_order.append('using autouse_fixture')
+
+        @pytest.fixture(scope='module')
+        def module_fixture():
+            invocation_order.append('using module fixture')
+
+        @pytest.fixture
+        def fixture1():
+            invocation_order.append('using fixture1')
+            return 'fixture1'
+
+        @pytest.fixture
+        def fixture2():
+            invocation_order.append('using fixture2')
+            return 'fixture2'
+
+        @pytest.mark.usefixtures("module_fixture")
+        @pytest.mark.parametrize("fixt", [lazy_fixture("fixture1"), lazy_fixture("fixture2")])
+        def test_test(fixt):
+            if fixt == 'fixture2':
+                print(' '.join(invocation_order))
+    """)
+    result = testdir.runpytest('-s')
+    stdout = result.stdout.str()
+    assert (
+        # pytest==3.2.5
+        'using autouse_fixture using module fixture using fixture1 using autouse_fixture using fixture2' in stdout
+        or
+        'using module fixture using autouse_fixture using fixture1 using autouse_fixture using fixture2' in stdout
+    )
+
+
+@pytest.mark.parametrize('autouse_scope', [
+    'session',
+    'module',
+    pytest.param('function', marks=pytest.mark.xfail)
+])
+def test_session_autouse_and_usefixture_module_scope_runs_before_function_fixtures(testdir, autouse_scope):
+    testdir.makepyfile("""
+        import pytest
+        from pytest_lazyfixture import lazy_fixture
+
+        invocation_order = []
+
+        @pytest.fixture(autouse=True, scope='{autouse_scope}')
+        def autouse_fixture():
+            invocation_order.append('using autouse_fixture')
+
+        @pytest.fixture(scope='module')
+        def module_fixture():
+            invocation_order.append('using module fixture')
+
+        @pytest.fixture
+        def fixture1():
+            invocation_order.append("using fixture1")
+            return 'fixture1'
+
+        @pytest.fixture
+        def fixture2():
+            invocation_order.append("using fixture2")
+            return 'fixture2'
+
+        @pytest.mark.usefixtures("module_fixture")
+        @pytest.mark.parametrize("fixt", [lazy_fixture("fixture1"), lazy_fixture("fixture2")])
+        def test_test(fixt):
+            if fixt == 'fixture2':
+                print(' '.join(invocation_order))
+    """.format(autouse_scope=autouse_scope))
+    result = testdir.runpytest('-s')
+    assert 'using autouse_fixture using module fixture using fixture1 using fixture2' in result.stdout.str()
+
+
+# https://github.com/TvoroG/pytest-lazy-fixture/issues/39
+def test_module_scope_runs_before_function_fixtures(testdir):
+    testdir.makepyfile("""
+        import pytest
+        from pytest_lazyfixture import lazy_fixture
+
+        invocation_order = []
+
+        @pytest.fixture(scope='module')
+        def module_fixture():
+            invocation_order.append('using module fixture')
+
+        @pytest.fixture
+        def fixture1():
+            invocation_order.append("using fixture1")
+            return 'fixture1'
+
+        @pytest.fixture
+        def fixture2():
+            invocation_order.append("using fixture2")
+            return 'fixture2'
+
+        @pytest.mark.parametrize("fixt", [lazy_fixture("fixture1"), lazy_fixture("fixture2")])
+        def test_test(fixt, module_fixture):
+            if fixt == 'fixture2':
+                print(' '.join(invocation_order))
+    """)
+    result = testdir.runpytest('-s')
+    stdout = result.stdout.str()
+    assert (
+        # pytest==3.2.5
+        'using fixture1 using module fixture using fixture2' in stdout
+        or
+        'using module fixture using fixture1 using fixture2' in stdout
+    )
+
+
+# https://github.com/TvoroG/pytest-lazy-fixture/issues/42
+@pytest.mark.skipif(numpy is None, reason='numpy is not installed')
+def test_numpy_array_as_value(testdir):
+    testdir.makepyfile("""
+        import pytest
+        import numpy as np
+
+        @pytest.mark.parametrize(
+            'value',
+            [
+                np.arange(10, dtype=np.int64),
+                np.arange(10, dtype=np.int32),
+            ]
+        )
+        def test_bug(value):
+            assert isinstance(value, np.ndarray)
+    """)
+    result = testdir.inline_run('-s')
+    result.assertoutcome(passed=2)
+
+
+# https://github.com/TvoroG/pytest-lazy-fixture/issues/46
+def test_lazy_fixture_ids(testdir):
+    testdir.makepyfile("""
+        import pytest
+        from pytest_lazyfixture import lazy_fixture
+
+        @pytest.fixture()
+        def foo():
+            return "foo"
+
+        @pytest.fixture(params=['spam', 'eggs'])
+        def bar(request):
+            return "bar-{}".format(request.param)
+
+        @pytest.mark.parametrize("data", [lazy_fixture("foo"),
+                                          lazy_fixture("bar")])
+        def test_the_thing(data):
+            assert False
+    """)
+    result = testdir.runpytest('--collect-only')
+    stdout = result.stdout.str()
+    assert 'test_the_thing[foo]' in stdout
+    assert 'test_the_thing[bar-spam]' in stdout
+    assert 'test_the_thing[bar-eggs]' in stdout
