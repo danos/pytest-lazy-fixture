@@ -1,4 +1,4 @@
-python-pytest-lazy-fixture (0.6.3-1) UNRELEASED; urgency=medium
+python-pytest-lazy-fixture (0.6.3-0danos1) unstable; urgency=medium
 
   * Team Upload.
 
@@ -22,7 +22,7 @@ python-pytest-lazy-fixture (0.6.3-1) UNRELEASED; urgency=medium
   * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
     Repository-Browse.
 
- -- Emmanuel Arias <eamanu@yaerobi.com>  Fri, 04 Jun 2021 10:48:58 -0300
+ -- William Ivory <william.ivory@intl.att.com>  Tue, 24 Aug 2021 17:58:34 +0100
 
 python-pytest-lazy-fixture (0.5.1-1) unstable; urgency=medium
 
